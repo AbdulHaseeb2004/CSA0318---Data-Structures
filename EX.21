@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int data[MAX];
+    int front;
+    int rear;
+} Queue;
+
+typedef struct {
+    Queue q1;
+    Queue q2;
+} Stack;
+
+void initQueue(Queue *q) {
+    q->front = -1;
+    q->rear = -1;
+}
+
+int isQueueEmpty(Queue *q) {
+    return q->front == -1;
+}
+
+int isQueueFull(Queue *q) {
+    return q->rear == MAX - 1;
+}
+
+void enqueue(Queue *q, int value) {
+    if(isQueueFull(q)) {
+        printf("Queue is full\n");
+        return;
+    }
+    if(isQueueEmpty(q)) {
+        q->front = 0;
+    }
+    q->data[++(q->rear)] = value;
+}
+
+int dequeue(Queue *q) {
+    if(isQueueEmpty(q)) {
+        printf("Queue is empty\n");
+        return -1;
+    }
+    int value = q->data[q->front];
+    if(q->front == q->rear) {
+        q->front = q->rear = -1;
+    } else {
+        q->front++;
+    }
+    return value;
+}
+
+void initStack(Stack *s) {
+    initQueue(&s->q1);
+    initQueue(&s->q2);
+}
+
+void push(Stack *s, int value) {
+    enqueue(&s->q1, value);
+}
+
+int pop(Stack *s) {
+    if(isQueueEmpty(&s->q1)) {
+        printf("Stack is empty\n");
+        return -1;
+    }
+    
+    // Move all elements except last from q1 to q2
+    while(s->q1.front != s->q1.rear) {
+        enqueue(&s->q2, dequeue(&s->q1));
+    }
+    
+    // Get the last element (top of stack)
+    int popped = dequeue(&s->q1);
+    
+    // Swap q1 and q2
+    Queue temp = s->q1;
+    s->q1 = s->q2;
+    s->q2 = temp;
+    
+    return popped;
+}
+
+int peek(Stack *s) {
+    if(isQueueEmpty(&s->q1)) {
+        return -1;
+    }
+    
+    int topValue;
+    // Move all elements to q2 to get to top
+    while(!isQueueEmpty(&s->q1)) {
+        topValue = dequeue(&s->q1);
+        enqueue(&s->q2, topValue);
+    }
+    
+    // Swap queues
+    Queue temp = s->q1;
+    s->q1 = s->q2;
+    s->q2 = temp;
+    
+    return topValue;
+}
+
+int main() {
+    Stack s;
+    initStack(&s);
+    
+    push(&s, 10);
+    push(&s, 20);
+    push(&s, 30);
+    
+    printf("Top element: %d\n", peek(&s));
+    printf("Popped: %d\n", pop(&s));
+    printf("Top element: %d\n", peek(&s));
+    
+    return 0;
+}
