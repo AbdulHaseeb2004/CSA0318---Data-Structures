@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+bool isNeedleInHaystack(char *haystack, char *needle) {
+    int haystackCount[256] = {0};
+    int needleCount[256] = {0};
+    
+    // Count characters in haystack
+    for(int i = 0; haystack[i] != '\0'; i++) {
+        haystackCount[(unsigned char)haystack[i]]++;
+    }
+    
+    // Count characters in needle
+    for(int i = 0; needle[i] != '\0'; i++) {
+        needleCount[(unsigned char)needle[i]]++;
+    }
+    
+    // Check if all needle characters exist in haystack
+    for(int i = 0; i < 256; i++) {
+        if(needleCount[i] > haystackCount[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int main() {
+    char haystack[100], needle[100];
+    
+    printf("Enter haystack string: ");
+    fgets(haystack, sizeof(haystack), stdin);
+    haystack[strcspn(haystack, "\n")] = 0;
+    
+    printf("Enter needle string: ");
+    fgets(needle, sizeof(needle), stdin);
+    needle[strcspn(needle, "\n")] = 0;
+    
+    if(isNeedleInHaystack(haystack, needle)) {
+        printf("True (1)\n");
+    } else {
+        printf("False (0)\n");
+    }
+    
+    return 0;
+}
